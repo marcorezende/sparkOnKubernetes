@@ -1,6 +1,8 @@
+import os
+
 import duckdb
 
-sf = 5
+sf = os.environ.get('SCALE_FACTOR')
 duckdb.sql('PRAGMA disable_progress_bar;SET preserve_insertion_order=false')
 duckdb.sql(f"CALL dbgen(sf={sf});")
 
