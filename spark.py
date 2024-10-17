@@ -1,10 +1,25 @@
 import time
 import pandas as pd
 
-
 from pyspark.sql import SparkSession
 
-from data_generator import generate_data
+import os
+
+import duckdb
+
+sf = os.environ.get('SCALE_FACTOR')
+duckdb.sql('PRAGMA disable_progress_bar;SET preserve_insertion_order=false')
+duckdb.sql(f"CALL dbgen(sf={sf});")
+
+
+def generate_parquet_delta(table):
+    duckdb.sql(f"select * from {table}").write_parquet(f'{table}.parquet')
+
+
+def generate_data():
+    for x in ['nation', 'region', 'customer', 'supplier', 'lineitem', 'orders', 'partsupp', 'part']:
+        generate_parquet_delta(x)
+
 
 generate_data()
 
@@ -910,14 +925,15 @@ ORDER BY
 def execute_query(engine, sql_script):
     all_dfs = []
     sql_arr = sql_script.split(";")
-    for idx, sql in enumerate(sql_arr, start=1):
-        if len(sql.strip()) > 0:
-            start = time.time()
-            engine.sql(sql).show()
-            stop = time.time()
-            duration = stop - start
-            print(duration)
-            all_dfs.append(pd.DataFrame([{'id': idx, 'dur': duration}]))
+    for n in range(1, int(os.getenv('ITERATOR')) + 1):
+        for idx, sql in enumerate(sql_arr, start=1):
+            if len(sql.strip()) > 0:
+                start = time.time()
+                engine.sql(sql).show()
+                stop = time.time()
+                duration = stop - start
+                print(duration)
+                all_dfs.append(pd.DataFrame([{'run': n, 'id': idx, 'dur': duration}]))
     return pd.concat(all_dfs)
 
 
