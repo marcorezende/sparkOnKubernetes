@@ -9,24 +9,50 @@ spec:
   image: "marcorezende/spark-delta-aws:3.5.0"
   imagePullPolicy: IfNotPresent
   mainClass: org.apache.spark.examples.SparkPi
-  mainApplicationFile: "local:///opt/spark/examples/src/main/python/delta_test.py"
+  mainApplicationFile: "local:///tmp/spark.py"
   sparkVersion: "3.5.0"
   sparkUIOptions:
     serviceLabels:
       test-label/v1: 'true'
+    servicePort: 4040
+    servicePortName: "ui"
+    serviceType: "ClusterIP"
   restartPolicy:
     type: Never
+
   driver:
-    cores: 1
-    coreLimit: "1200m"
-    memory: "512m"
+    cores: 4
+    coreLimit: "6"
+    memory: "8g"
+    env:
+      - name: "ITERATOR"
+        value: "1"
+      - name: "SCALE_FACTORY"
+        value: "1"
     labels:
       version: 3.5.0
     serviceAccount: spark
+    volumeMounts:
+      - name: spark-app-volume
+        mountPath: /tmp
 
   executor:
-    cores: 1
-    instances: 1
-    memory: "512m"
+    cores: 4
+    instances: 2
+    memory: "8g"
+    env:
+      - name: "ITERATOR"
+        value: "1"
+      - name: "SCALE_FACTORY"
+        value: "1"
     labels:
       version: 3.5.0
+    volumeMounts:
+      - name: spark-app-volume
+        mountPath: /tmp
+
+  volumes:
+    - name: spark-app-volume
+      hostPath:
+        path: "/run/desktop/mnt/host/c/Users/edierley.messias/Desktop/testedockergpu/sparkOnKubernetes"
+        type: Directory
