@@ -1,3 +1,6 @@
+Para rodar os testes localmente build a imagem "marcorezende/spark-delta-aws:3.5.0-custom" a partir
+do Dockerfile
+
 Adicionar repo do spark
 ```
 helm repo add spark-operator https://kubeflow.github.io/spark-operator 

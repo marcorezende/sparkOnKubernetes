@@ -13,7 +13,7 @@ duckdb.sql(f"CALL dbgen(sf={sf});")
 
 
 def generate_parquet_delta(table):
-    duckdb.sql(f"select * from {table}").write_parquet(f'{table}.parquet')
+    duckdb.sql(f"select * from {table}").write_parquet(f'/tmp/{table}.parquet')
 
 
 def generate_data():
@@ -24,14 +24,14 @@ def generate_data():
 generate_data()
 
 spark = SparkSession.builder.appName("PySpark Read Parquet").getOrCreate()
-spark.read.parquet('lineitem.parquet').createOrReplaceTempView("lineitem")
-spark.read.parquet('orders.parquet').createOrReplaceTempView("orders")
-spark.read.parquet('nation.parquet').createOrReplaceTempView("nation")
-spark.read.parquet('customer.parquet').createOrReplaceTempView("customer")
-spark.read.parquet('partsupp.parquet').createOrReplaceTempView("partsupp")
-spark.read.parquet('supplier.parquet').createOrReplaceTempView("supplier")
-spark.read.parquet('region.parquet').createOrReplaceTempView("region")
-spark.read.parquet('part.parquet').createOrReplaceTempView("part")
+spark.read.parquet('/tmp/lineitem.parquet').createOrReplaceTempView("lineitem")
+spark.read.parquet('/tmp/orders.parquet').createOrReplaceTempView("orders")
+spark.read.parquet('/tmp/nation.parquet').createOrReplaceTempView("nation")
+spark.read.parquet('/tmp/customer.parquet').createOrReplaceTempView("customer")
+spark.read.parquet('/tmp/partsupp.parquet').createOrReplaceTempView("partsupp")
+spark.read.parquet('/tmp/supplier.parquet').createOrReplaceTempView("supplier")
+spark.read.parquet('/tmp/region.parquet').createOrReplaceTempView("region")
+spark.read.parquet('/tmp/part.parquet').createOrReplaceTempView("part")
 
 sql = ('''
 SELECT
